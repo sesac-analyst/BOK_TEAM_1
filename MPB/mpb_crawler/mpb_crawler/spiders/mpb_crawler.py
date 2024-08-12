@@ -64,7 +64,6 @@ class MpbCrawlerSpider(scrapy.Spider):
             for page_num in range(len(pdf_reader.pages)):
                 page = pdf_reader.pages[page_num]
                 text += page.extract_text()
-            print(text)
 
             yield {
                 'date': date,
