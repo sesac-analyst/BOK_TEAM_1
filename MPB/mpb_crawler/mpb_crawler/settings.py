@@ -17,7 +17,7 @@ NEWSPIDER_MODULE = "mpb_crawler.spiders"
 #USER_AGENT = "mpb_crawler (+http://www.yourdomain.com)"
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -62,9 +62,9 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    "mpb_crawler.pipelines.MpbCrawlerPipeline": 300,
-#}
+ITEM_PIPELINES = {
+   "mpb_crawler.pipelines.MpbCrawlerPipeline": 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
@@ -91,3 +91,11 @@ DOWNLOADER_MIDDLEWARES = {
 REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
+
+FILES_STORE = './temp_pdf'
+
+# from shutil import which
+
+# SELENIUM_DRIVER_NAME = 'chrome'
+# SELENIUM_DRIVER_EXECUTABLE_PATH = which('chromedriver')  # chromedriver의 경로
+# SELENIUM_DRIVER_ARGUMENTS = ['--headless']  # '--headless'를 사용하여 브라우저를 숨김 모드로 실행

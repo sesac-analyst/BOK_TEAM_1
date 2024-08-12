@@ -8,6 +8,6 @@
 from itemadapter import ItemAdapter
 
 
-class MpbCrawlerPipeline:
+class MpbCrawlerPipeline():
     def process_item(self, item, spider):
-        return item
+        pass
