@@ -4,6 +4,7 @@ from io import BytesIO
 import os
 import time
 import re
+import requests
 
 
 class MpbCrawlerSpider(scrapy.Spider):
@@ -28,6 +29,7 @@ class MpbCrawlerSpider(scrapy.Spider):
         for page_index in range(1, 4): # 21로 해야함
             params['pageIndex'] = page_index
             url = f"{base_url}?{'&'.join([f'{key}={value}' for key, value in params.items()])}"
+            print(url)
             yield scrapy.Request(url=url, callback=self.parse)
         
 
@@ -51,9 +53,15 @@ class MpbCrawlerSpider(scrapy.Spider):
             yield scrapy.Request(pdf_url, callback=self.parse_pdf, meta={'title': title})
 
     def parse_pdf(self, response):
+        print('---------------parsepdf-------------')
         try:
+            # PDF 파일 다운로드
+            pdf_url = response.url
+            pdf_response = requests.get(pdf_url)
+            pdf_response.raise_for_status()  # 다운로드 오류 확인
+
             # PDF 파일 읽기
-            pdf_reader = PdfReader(BytesIO(response.body))
+            pdf_reader = PdfReader(BytesIO(pdf_response.content))
 
             # 제목에서 날짜 추출
             date_match = re.search(r'\((\d{4}.\d{2}.\d{2})\)', response.meta['title'])
