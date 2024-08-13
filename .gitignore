@@ -8,6 +8,7 @@
 *.env
 *secret*
 *.text
+*.json
 
 
 ### macOS ###
