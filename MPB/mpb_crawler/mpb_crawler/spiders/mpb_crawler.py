@@ -55,29 +55,24 @@ class MpbCrawlerSpider(scrapy.Spider):
     def parse_pdf(self, response):
         print('---------------parsepdf-------------')
         try:
-            # PDF 파일 다운로드
-            pdf_url = response.url
-            pdf_response = requests.get(pdf_url)
-            pdf_response.raise_for_status()  # 다운로드 오류 확인
-
             # PDF 파일 읽기
-            pdf_reader = PdfReader(BytesIO(pdf_response.content))
-
+            pdf_reader = PdfReader(BytesIO(response.body))
+    
             # 제목에서 날짜 추출
-            date_match = re.search(r'\((\d{4}.\d{2}.\d{2})\)', response.meta['title'])
+            date_match = re.search(r'\((\d{4}\.\d{1,2}\.\d{1,2})\)', response.meta['title'])
             date = date_match.group(1) if date_match else None
-
+    
             # 모든 페이지의 텍스트 추출
             text = ''
             for page_num in range(len(pdf_reader.pages)):
                 page = pdf_reader.pages[page_num]
                 text += page.extract_text()
-
+    
             yield {
                 'date': date,
                 'title': response.meta['title'],
                 'text': text
             }
-
+    
         except Exception as e:
             print(f"Error parsing PDF: {e}")
