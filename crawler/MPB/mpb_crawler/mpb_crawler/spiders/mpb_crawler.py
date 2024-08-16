@@ -1,5 +1,5 @@
 import scrapy
-from PyPDF2 import PdfReader
+from tika import parser
 from io import BytesIO
 import os
 import time
@@ -39,7 +39,7 @@ class MpbCrawlerSpider(scrapy.Spider):
         # links for each articles in the list
         for news_item in response.css('li.bbsRowCls'):
             news_link = news_item.css('a::attr(href)').get()
-            title = news_item.css('a::text').get().strip()
+            title = news_item.css('a::text').getall()[1].strip()
             if news_link:
                 yield response.follow(news_link, self.download_pdf, meta={'title':title})
 
@@ -49,30 +49,35 @@ class MpbCrawlerSpider(scrapy.Spider):
         title = response.meta.get('title')
 
         if len(pdf_links) > 1:
-            pdf_url = base_url + pdf_links[1]
+            pdf_link = pdf_links[0] if 'pdf' in pdf_links[0] else pdf_links[1]
+            pdf_url = base_url + pdf_link
             yield scrapy.Request(pdf_url, callback=self.parse_pdf, meta={'title': title})
 
     def parse_pdf(self, response):
         print('---------------parsepdf-------------')
         try:
-            # PDF 파일 읽기
-            pdf_reader = PdfReader(BytesIO(response.body))
-    
-            # 제목에서 날짜 추출
+            parsed = parser.from_buffer(response.body)
+            text = parsed["content"]
+            # 제목에서 날짜 추출 (기존 코드와 동일)
             date_match = re.search(r'\((\d{4}\.\d{1,2}\.\d{1,2})\)', response.meta['title'])
             date = date_match.group(1) if date_match else None
-    
-            # 모든 페이지의 텍스트 추출
-            text = ''
-            for page_num in range(len(pdf_reader.pages)):
-                page = pdf_reader.pages[page_num]
-                text += page.extract_text()
-    
-            yield {
-                'date': date,
-                'title': response.meta['title'],
-                'text': text
-            }
+            title = response.meta['title']
+            print('----------------------------')
+            print(date)
+            print('----------------------------')
+            print(title)
+            print('----------------------------')
+            print(text[:10])
+            print('----------------------------')
+
+            if text:
+                yield {
+                    'date': date,
+                    'title': title,
+                    'text': text
+                }
+            else:
+                print("pdf 파일을 읽을 수 없습니다")
     
         except Exception as e:
             print(f"Error parsing PDF: {e}")

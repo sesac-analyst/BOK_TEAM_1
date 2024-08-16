@@ -10,4 +10,4 @@ from itemadapter import ItemAdapter
 
 class MpbCrawlerPipeline():
     def process_item(self, item, spider):
-        pass
+        return item
