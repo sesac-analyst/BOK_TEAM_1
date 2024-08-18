@@ -29,7 +29,6 @@ class MpbCrawlerSpider(scrapy.Spider):
         for page_index in range(1, 4): # 21로 해야함
             params['pageIndex'] = page_index
             url = f"{base_url}?{'&'.join([f'{key}={value}' for key, value in params.items()])}"
-            print(url)
             yield scrapy.Request(url=url, callback=self.parse)
         
 
@@ -54,7 +53,6 @@ class MpbCrawlerSpider(scrapy.Spider):
             yield scrapy.Request(pdf_url, callback=self.parse_pdf, meta={'title': title})
 
     def parse_pdf(self, response):
-        print('---------------parsepdf-------------')
         try:
             parsed = parser.from_buffer(response.body)
             text = parsed["content"]
@@ -62,19 +60,31 @@ class MpbCrawlerSpider(scrapy.Spider):
             date_match = re.search(r'\((\d{4}\.\d{1,2}\.\d{1,2})\)', response.meta['title'])
             date = date_match.group(1) if date_match else None
             title = response.meta['title']
-            print('----------------------------')
-            print(date)
-            print('----------------------------')
-            print(title)
-            print('----------------------------')
-            print(text[:10])
-            print('----------------------------')
+
+            # section2 (위원 토의내용) 추출
+            discussion_pattern = r"\(２\) 위원 토의내용\n(.*?)\n\(３\) 심의결과"
+            discussion_content = re.search(discussion_pattern, text, re.DOTALL)
+            if discussion_content:
+                discussion_text = discussion_content.group(1).strip()
+            else:
+                print("위원 토의내용을 찾을 수 없습니다.")
+
+            # section3 (심의결과) 추출
+            decision_pattern = r"\(３\) 심의결과(.*)"
+            decision_content = re.search(decision_pattern, text, re.DOTALL)
+            if decision_content:
+                decision_text = decision_content.group(1).strip()
+            else:
+                print("심의결과를 찾을 수 없습니다.")
 
             if text:
                 yield {
                     'date': date,
                     'title': title,
-                    'text': text
+                    'content': text,
+                    'discussion': discussion_text,
+                    'decision': decision_text,
+                    'link': response.url
                 }
             else:
                 print("pdf 파일을 읽을 수 없습니다")
