@@ -26,7 +26,7 @@ class MpbCrawlerSpider(scrapy.Spider):
             'depth4': 200789,
         }
 
-        for page_index in range(1, 4): # 21로 해야함
+        for page_index in range(1, 21): # 21로 해야함
             params['pageIndex'] = page_index
             url = f"{base_url}?{'&'.join([f'{key}={value}' for key, value in params.items()])}"
             yield scrapy.Request(url=url, callback=self.parse)
@@ -57,25 +57,19 @@ class MpbCrawlerSpider(scrapy.Spider):
             parsed = parser.from_buffer(response.body)
             text = parsed["content"]
             # 제목에서 날짜 추출 (기존 코드와 동일)
-            date_match = re.search(r'\((\d{4}\.\d{1,2}\.\d{1,2})\)', response.meta['title'])
-            date = date_match.group(1) if date_match else None
+            date_matches = re.findall(r'(\d{4}\.\d{1,2}\.\d{1,2})', response.meta['title'])
+            date = date_matches[0] if date_matches else None
             title = response.meta['title']
 
             # section2 (위원 토의내용) 추출
-            discussion_pattern = r"\(２\) 위원 토의내용\n(.*?)\n\(３\) 심의결과"
+            discussion_pattern = r"위원 토의내용(.*?)심의결과"
             discussion_content = re.search(discussion_pattern, text, re.DOTALL)
-            if discussion_content:
-                discussion_text = discussion_content.group(1).strip()
-            else:
-                print("위원 토의내용을 찾을 수 없습니다.")
+            discussion_text = discussion_content.group(1).strip().replace('\n', '') if discussion_content else None
 
             # section3 (심의결과) 추출
-            decision_pattern = r"\(３\) 심의결과(.*)"
+            decision_pattern = r"심의결과(.*)"
             decision_content = re.search(decision_pattern, text, re.DOTALL)
-            if decision_content:
-                decision_text = decision_content.group(1).strip()
-            else:
-                print("심의결과를 찾을 수 없습니다.")
+            decision_text = decision_content.group(1).strip().replace('\n', '') if decision_content else None
 
             if text:
                 yield {
