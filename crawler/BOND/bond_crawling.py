@@ -1,3 +1,5 @@
+# 3 muti threading (PDF to CSV, date+link)
+
 from bs4 import BeautifulSoup
 import requests
 import time
@@ -91,8 +93,8 @@ def process_report(report_link):
                 csv_file_path = f'{directory}/{published_date}_{title}_{cop_name}.csv'
                 with open(csv_file_path, 'w', newline='', encoding='utf-8') as csvfile:
                     csvwriter = csv.writer(csvfile)
-                    csvwriter.writerow(['날짜', '제목', '요약', '내용'])  # CSV 헤더
-                    csvwriter.writerow([published_date, title, content, kospacing_result])  # CSV 데이터
+                    csvwriter.writerow(['Date', 'Title', 'Content', 'Link'])  # CSV 헤더
+                    csvwriter.writerow([published_date, title, kospacing_result, pdf_link])  # CSV 데이터
 
                 print(f"Saved CSV: {csv_file_path}")
 
