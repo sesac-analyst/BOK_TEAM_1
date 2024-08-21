@@ -9,6 +9,7 @@
 *secret*
 *.text
 *.json
+eda.ipynb
 
 
 ### macOS ###
