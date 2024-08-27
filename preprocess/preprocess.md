@@ -109,7 +109,7 @@ df_corpus['Label'].value_counts()
 0 : 51235<br>
 <br>
 ## 3. 토큰화 및 정규화
-eKoNLPy와 Mecab을 사용하여 텍스트 데이터를 토큰화하고, 각 단어의 품사 정보를 추가(POS Tagging) (멀티프로세싱 적용)
+eKoNLPy와 Mecab을 사용하여 텍스트 데이터를 토큰화하고, 각 단어의 품사 정보를 추가(POS Tagging)<br>
 사용 라이브러리 :<br>
 eKoNLPy : 한국어 경제 용어 사전<br>
 Mecab : 토큰화, 품사태깅<br>
