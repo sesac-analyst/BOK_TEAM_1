@@ -42,7 +42,7 @@ df_bond.drop(columns=['Unnamed: 0'], inplace=True)
 df_corp = pd.concat([df_news, df_bond, df_mpb_mod], ignore_index=True)
 df_corp
 
-![통합 데이터프레임(df_corp)](preprocess/md_images/2024-08-27_100421.png)
+![통합 데이터프레임(df_corp)](md_images/2024-08-27_100421.png)
 ## 2. 데이터 레이블링
 
 ### 2-1. 각 데이터의 출처와 날짜를 기준으로 primary key 생성
@@ -93,7 +93,7 @@ def calculate_label(article_date):
 df_corpus
     ```
 
-![라벨링 데이터프레임(df_corpus)](preprocess/md_images/lbdf_2024-08-27_100610.png)
+![라벨링 데이터프레임(df_corpus)](md_images\lbdf_2024-08-27_100610.png)
 
 ### 2-3. Label 값이 NaN 인 데이터 제거
 ```python
