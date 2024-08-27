@@ -92,7 +92,7 @@ def calculate_label(article_date):
 
     df_corpus['Label'] = df_corpus['Date'].apply(calculate_label)
 df_corpus
-    ```
+```
 
 ![라벨링 데이터프레임(df_corpus)](md_images/lbdf_2024-08-27_100610.png)
 
@@ -169,8 +169,8 @@ def main():
 if __name__ == "__main__":
     main()
 ```
-![토큰화, 품사태깅 전](md_images\before_tokenize.png)
-![토큰화, 품사태깅 후](md_images\after_tokenize.png)
+![토큰화, 품사태깅 전](md_images/before_tokenize.png)
+![토큰화, 품사태깅 후](md_images/after_tokenize.png)
 
 ## 정규화
 n-그램 분석에 필요한 품사를 필터링
