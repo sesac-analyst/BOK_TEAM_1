@@ -4,7 +4,7 @@ News_U.csv: '금리' 키워드의 뉴스 기사 데이터<br>
 cleaned_bond.csv: 채권 데이터<br>
 cleaned_MPB.csv: 통화정책회의 의사록(Monetary Policy Board, MPB) 데이터<br>
 call_rates_3.csv: 콜 금리 데이터<br>
-
+<br>
  ### 1-1. 데이터 출처 표기 위해 source 컬럼 추가
 ```python
 # add source column to identify the source of the news
@@ -12,7 +12,6 @@ df_news['source'] = df_news['Link'].apply(lambda x: 'infomax' if 'infomax' in x 
 df_bond['source'] = 'bond'
 df_mpb['source'] = 'mpb'
 ```
-
 ### 1-2. MPB 데이터프레임 컬럼 통합하여 데이터 차원 통일, 컬럼 이름 통일
 ```python
 df_mpb_mod = df_mpb.copy()
@@ -44,6 +43,10 @@ df_corp
 ```
 
 ![통합 데이터프레임(df_corp)](md_images/2024-08-27_100421.png)
+통합 데이터프레임(df_corp)
+
+<br>
+
 ## 2. 데이터 레이블링
 
 ### 2-1. 각 데이터의 출처와 날짜를 기준으로 primary key 생성
@@ -95,7 +98,7 @@ df_corpus
 ```
 
 ![라벨링 데이터프레임(df_corpus)](md_images/lbdf_2024-08-27_100610.png)
-
+라벨링 데이터프레임(df_corpus)
 ### 2-3. Label 값이 NaN 인 데이터 제거
 ```python
 df_corpus.dropna(inplace=True)
@@ -104,10 +107,14 @@ df_corpus['Label'].value_counts()
 제거 후 레이블별 데이터<br>
 1 : 64902<br> 
 0 : 51235<br>
-
-
-## 2. 토큰화 및 정규화
-eKoNLPy와 Mecab을 사용하여 텍스트 데이터를 토큰화하고, 각 단어의 품사 정보를 추가(POS Taggin) (멀티프로세싱 적용)
+<br>
+## 3. 토큰화 및 정규화
+eKoNLPy와 Mecab을 사용하여 텍스트 데이터를 토큰화하고, 각 단어의 품사 정보를 추가(POS Tagging) (멀티프로세싱 적용)
+사용 라이브러리 :<br>
+eKoNLPy : 한국어 경제 용어 사전<br>
+Mecab : 토큰화, 품사태깅<br>
+multiprocessing : 멀티프로세싱 적용<br>
+<br>
 
 ```python
 # 토크나이저 & POS tagging
@@ -169,16 +176,57 @@ def main():
 if __name__ == "__main__":
     main()
 ```
-![토큰화, 품사태깅 전](md_images/before_tokenize.png)
-![토큰화, 품사태깅 후](md_images/after_tokenize.png)
+![토큰화, 품사태깅 전](md_images/before_tokenize.png)<br>
+토큰화, 품사태깅 전
 
-## 정규화
-n-그램 분석에 필요한 품사를 필터링
 
-필터링 품사:
+![토큰화, 품사태깅 후](md_images/after_tokenize.png)<br>
+토큰화, 품사태깅 후
+<br>
+<br>
 
-NNG (일반명사)
-VA (형용사)
-MAG (일반부사)
-VV (동사)
-VCN (부정 지정사)
+## 4. n-그램 분석
+
+### 4-1. 병렬처리를 위해 통합 데이터를 10개로 분리
+
+```python
+# Split the DataFrame into 8 equal parts
+df_parts = np.array_split(df_corpus, 10)
+
+# Save each part as a separate CSV file
+for i, part in enumerate(df_parts):
+    part.to_csv(f'corpus_tokenized_{i+1}.csv', index=False)
+```
+
+<br>
+
+### 4-2. n-grams 분석에 필요한 품사를 필터링
+
+필터링 품사 :<br>
+NNG (일반명사)<br>
+VA (형용사)<br>
+MAG (일반부사)<br>
+VV (동사)<br>
+VCN (부정 지정사)<br>
+
+```python
+def ngramize_doh(tokens, n, pos_tags=['NNG', 'VA', 'MAG', 'VV', 'VCN']):
+    filtered_tokens = [token for token, pos in tokens if pos in pos_tags]
+    return [filtered_tokens[i:i+n] for i in range(len(filtered_tokens)-n+1)]
+```
+
+### 4-3. 토큰화 텍스트 데이터(tokens_pos 컬럼)를 리스트로 파싱
+```python
+cor_7['parsed_tokens'] = cor_7['tokens_pos'].apply(ast.literal_eval)
+cor_7['parsed_tokens']
+```
+
+<br>
+
+### 4-3. n-grams 분석 (1-grams to 5-grams)
+```python
+for idx in range(1, 6):
+    cor_7[f'{idx}gram'] = cor_7['parsed_tokens'].apply(lambda x: ngramize(x, idx))
+    globals()[f'corpus7_{idx}gram'] = cor_7[['pk', 'Date', 'Label', f'{idx}gram']].copy()
+```
+![토큰화, 품사태깅 후](md_images/n-grams_result_image.png)
