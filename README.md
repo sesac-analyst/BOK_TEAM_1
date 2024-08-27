@@ -14,4 +14,5 @@
 3. 모델링 및 평가
 #### 프로젝트 환경
 Visual Studio Code, Jupyter Lab, Notion, Github, SLACK
+
 Python 3.8, Pandas, Numpy, Multiprocessing
