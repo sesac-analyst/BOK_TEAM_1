@@ -17,3 +17,6 @@
 Visual Studio Code, Jupyter Lab, Notion, Github, SLACK
 
 Python 3.8, Pandas, Numpy, Multiprocessing
+
+####💯팀 구성
+김도형(팀장), 김관용, 윤종헌, 이현정, 원형일
