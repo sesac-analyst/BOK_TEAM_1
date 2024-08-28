@@ -9,7 +9,7 @@
 *secret*
 *.text
 *.json
-*.idea
+*.idea/
 eda.ipynb
 
 
