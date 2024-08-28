@@ -1,5 +1,5 @@
 import scrapy
-from PyPDF2 import PdfReader
+from tika import parser
 from io import BytesIO
 import os
 import time
@@ -26,10 +26,9 @@ class MpbCrawlerSpider(scrapy.Spider):
             'depth4': 200789,
         }
 
-        for page_index in range(1, 4): # 21로 해야함
+        for page_index in range(1, 21): # 21로 해야함
             params['pageIndex'] = page_index
             url = f"{base_url}?{'&'.join([f'{key}={value}' for key, value in params.items()])}"
-            print(url)
             yield scrapy.Request(url=url, callback=self.parse)
         
 
@@ -39,7 +38,7 @@ class MpbCrawlerSpider(scrapy.Spider):
         # links for each articles in the list
         for news_item in response.css('li.bbsRowCls'):
             news_link = news_item.css('a::attr(href)').get()
-            title = news_item.css('a::text').get().strip()
+            title = news_item.css('a::text').getall()[1].strip()
             if news_link:
                 yield response.follow(news_link, self.download_pdf, meta={'title':title})
 
@@ -49,30 +48,40 @@ class MpbCrawlerSpider(scrapy.Spider):
         title = response.meta.get('title')
 
         if len(pdf_links) > 1:
-            pdf_url = base_url + pdf_links[1]
+            pdf_link = pdf_links[0] if 'pdf' in pdf_links[0] else pdf_links[1]
+            pdf_url = base_url + pdf_link
             yield scrapy.Request(pdf_url, callback=self.parse_pdf, meta={'title': title})
 
     def parse_pdf(self, response):
-        print('---------------parsepdf-------------')
         try:
-            # PDF 파일 읽기
-            pdf_reader = PdfReader(BytesIO(response.body))
-    
-            # 제목에서 날짜 추출
-            date_match = re.search(r'\((\d{4}\.\d{1,2}\.\d{1,2})\)', response.meta['title'])
-            date = date_match.group(1) if date_match else None
-    
-            # 모든 페이지의 텍스트 추출
-            text = ''
-            for page_num in range(len(pdf_reader.pages)):
-                page = pdf_reader.pages[page_num]
-                text += page.extract_text()
-    
-            yield {
-                'date': date,
-                'title': response.meta['title'],
-                'text': text
-            }
+            parsed = parser.from_buffer(response.body)
+            text = parsed["content"]
+            # 제목에서 날짜 추출 (기존 코드와 동일)
+            date_matches = re.findall(r'(\d{4}\.\d{1,2}\.\d{1,2})', response.meta['title'])
+            date = date_matches[0] if date_matches else None
+            title = response.meta['title']
+
+            # section2 (위원 토의내용) 추출
+            discussion_pattern = r"위원 토의내용(.*?)심의결과"
+            discussion_content = re.search(discussion_pattern, text, re.DOTALL)
+            discussion_text = discussion_content.group(1).strip().replace('\n', '') if discussion_content else None
+
+            # section3 (심의결과) 추출
+            decision_pattern = r"심의결과(.*)"
+            decision_content = re.search(decision_pattern, text, re.DOTALL)
+            decision_text = decision_content.group(1).strip().replace('\n', '') if decision_content else None
+
+            if text:
+                yield {
+                    'date': date,
+                    'title': title,
+                    'content': text,
+                    'discussion': discussion_text,
+                    'decision': decision_text,
+                    'link': response.url
+                }
+            else:
+                print("pdf 파일을 읽을 수 없습니다")
     
         except Exception as e:
             print(f"Error parsing PDF: {e}")
