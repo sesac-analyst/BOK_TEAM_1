@@ -1,7 +1,8 @@
 # 📌 기준 금리 예측 프로젝트
+## 1. 프로젝트 개요
+<img src="./assets/pipeline.png" style="width:100%;">
 
-
-## 1. 프로젝트 목적
+## 2. 프로젝트 목적
 Deciphering Monetary Policy Board Minutes with Text Mining: The Case of South Korea 논문 구현 프로젝트로 뉴스기사, 채권분석리포트, 금융통화위원회 의사록을 크롤링해 텍스트 데이터를 얻고 데이터를 자연어 처리, 모델링 과정을 거쳐 감성 분석을 진행한 후 이를 통해 머신러닝, 딥러닝 모델에 학습시켜 다음 금리의 방향성을 예측하고자 한다.
 <!-- - 프로젝트 기간 : 2024.08.08 - 2024.08.28
 - 프로그래밍 언어 : Python
@@ -9,14 +10,14 @@ Deciphering Monetary Policy Board Minutes with Text Mining: The Case of South Ko
 
 <br/>
 
-## 2. 프로젝트 기간
+## 3. 프로젝트 기간
 2024년 8월 8일 - 2024년 8월 28일
 
 
 <br/>
 
 
-## 3. 프로젝트 진행
+## 4. 프로젝트 진행
 ✔ <b>데이터 수집</b>
 <ul>
 <li>연합뉴스, 연합인포맥스, 이데일리</li>
@@ -46,7 +47,7 @@ Deciphering Monetary Policy Board Minutes with Text Mining: The Case of South Ko
 
 <br/>
 
-## 4. 프로젝트 환경 및 언어
+## 5. 프로젝트 환경 및 언어
 ✔ <b>개발 환경</b> : Visual Studio Code, Jupyter Lab, Notion, Github, SLACK, Google Drive  
 <br/>
 ✔ <b>개발 언어 및 모듈</b> : Python 3.8, Pandas, Numpy, Multiprocessing
@@ -54,7 +55,7 @@ Deciphering Monetary Policy Board Minutes with Text Mining: The Case of South Ko
 
 <br/>
 
-## 5. 팀(BOK_TEAM_1) 구성
+## 6. 팀(BOK_TEAM_1) 구성
 - 김도형(팀장) : dkswhale@gmail.com      
 - 김관용 : kwanyou2@gmail.com  
 - 윤종헌 : yoonjh0420@gmail.com  
@@ -63,7 +64,7 @@ Deciphering Monetary Policy Board Minutes with Text Mining: The Case of South Ko
 
 <br/>
 
-## 6. 기타
+## 7. 기타
 - [Notion](https://www.notion.so/970acb4571a942bc999f19e400ced872)
 - [github](https://github.com/sesac-analyst/BOK_TEAM_1/tree/main)
 
